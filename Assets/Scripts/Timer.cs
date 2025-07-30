@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Unity.Netcode;
@@ -9,114 +7,74 @@ public class Timer : NetworkBehaviour
 {
     public Slider timeSlider;
     public TextMeshProUGUI timeLabel;
-
-
-
-    [SerializeField] private NetworkVariable<float> time = new NetworkVariable<float>(
-        value: 0f,
-        writePerm: NetworkVariableWritePermission.Server);
-
-    [SerializeField] private TextMeshProUGUI txtTime;
-    public TextMeshProUGUI txtTimeCnt;
-    public TextMeshProUGUI txtTimeEva;
-
+    public TextMeshProUGUI txtTime;
     public Toggle toggle;
 
-    public GameObject panelIncorrect;
-    public Image imageStatus;
-    public Sprite spriteIncorrect;
-
-    
     [SerializeField]
-    private NetworkVariable<bool> startTimer = new NetworkVariable<bool>(value: false,
-        writePerm: NetworkVariableWritePermission.Server);
+    private NetworkVariable<float> syncedTime = new NetworkVariable<float>(
+        0f, NetworkVariableReadPermission.Everyone);
 
-    private int selectedTime;
+    private float selectedTime = 30f;
+    private bool startTimer = false;
 
     void Start()
     {
-        txtTime.text = "00:25";
-        txtTimeCnt.text = "00:25";
-        txtTimeEva.text = "00:25";
-        timeSlider.onValueChanged.AddListener(UpdateTimeLabel);
+        
+            timeSlider.onValueChanged.AddListener(UpdateTimeLabel);
+            toggle.onValueChanged.AddListener(ToggleCrtl);
+        
 
-
+        // Inicializar visualmente
+        UpdateUI();
     }
 
-    void UpdateTimeLabel(float value)
+    void Update()
     {
+        if (startTimer)
+        {
+            syncedTime.Value -= Time.deltaTime;
 
-        selectedTime = (int)value;
-        timeLabel.text = "Tiempo: " + selectedTime.ToString("0") + " segundos";
+            if (syncedTime.Value <= 0f)
+            {
+                syncedTime.Value = 0f;
+                startTimer = false;
+                toggle.isOn = false;
+            }
+        }
+
+        // Actualizar UI en todos los clientes y el host
+        UpdateUI();
+    }
+
+    void UpdateUI()
+    {
+        int seconds = Mathf.CeilToInt(syncedTime.Value);
+        txtTime.text = "00:" + seconds.ToString("00");
+
+        if (timeSlider != null)
+            timeSlider.value = (int)selectedTime;
+
+        if (timeLabel != null)
+            timeLabel.text = "Tiempo: " + selectedTime.ToString("0") + " segundos";
+    }
+
+    public void UpdateTimeLabel(float value)
+    {
+        
+        selectedTime = value;
+        syncedTime.Value = selectedTime;
     }
 
     public void ToggleCrtl(bool enabled)
     {
-        startTimer.Value = enabled;
-    }
+        if (!IsServer) return;
 
-    public void StopTimer()
-    {
-        startTimer.Value = false;
-    }
+        startTimer = enabled;
 
-    private void Update()
-    {
-        if (!startTimer.Value)
-        {
-            time.Value = selectedTime;
-        }
-
-        UpdateTimeLabel(timeSlider.value);
-
-        if (Input.GetKeyDown("up"))
-        {
-            startTimer.Value = true;
-        }
-
-        if (Input.GetKeyDown("down"))
-        {
-            startTimer.Value = false;
-        }
-
-        if (startTimer.Value == true)
-        {
-            StartTimer();
-        }
-
-        if (time.Value <= 0)
-        {
-            startTimer.Value = false;
-            toggle.isOn = false;
-            ResetTimer();
-            panelIncorrect.SetActive(true);
-            imageStatus.sprite = spriteIncorrect;
-        }
-
-        int seconds = (int)time.Value;
-
-        txtTime.text = "00" + ":" + seconds.ToString().PadLeft(2, '0');
-        txtTimeCnt.text = "00" + ":" + seconds.ToString().PadLeft(2, '0');
-        txtTimeEva.text = "00" + ":" + seconds.ToString().PadLeft(2, '0');
-
-
-    }
-
-    public void StartTimer()
-    {
-
-        time.Value -= Time.deltaTime;
-        int seconds = (int)time.Value;
-
-        txtTime.text = "00" + ":" + seconds.ToString().PadLeft(2, '0');
-        txtTimeCnt.text = "00" + ":" + seconds.ToString().PadLeft(2, '0');
-        txtTimeEva.text = "00" + ":" + seconds.ToString().PadLeft(2, '0');
     }
 
     public void ResetTimer()
     {
-        time.Value = selectedTime;
+        syncedTime.Value = selectedTime;
     }
-
-
 }

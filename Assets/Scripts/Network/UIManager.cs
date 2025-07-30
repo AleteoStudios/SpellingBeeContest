@@ -2,24 +2,33 @@
 using UnityEngine.UI;
 using Unity.Netcode;
 using TMPro;
-using UnityEngine.SceneManagement;
+
 
 public class UIManager : MonoBehaviour
 {
     public Button botonHost;
     public Button botonCliente;
-    public Button botonDesconectar;
+    
     public GameObject discoveryServer;
     public GameObject discoveryClient;
 
     public TMP_Text estadoTexto;
     public GameObject estadoPanel;
 
-    public string sceneName; 
+  
 
     void Start()
     {
-        sceneName = SceneManager.GetActiveScene().name;
+        if (NetworkManager.Singleton == null)
+        {
+            Debug.LogError("No se encontró el NetworkManager.");
+            return;
+        }
+
+        // Suscribirse al evento de conexión de cliente (solo si eres host)
+        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+
+
         botonHost.onClick.AddListener(() =>
         {
             NetworkManager.Singleton.StartHost();
@@ -31,47 +40,56 @@ public class UIManager : MonoBehaviour
             discoveryClient.SetActive(true); // activa escucha del cliente
         });
 
-        botonDesconectar.onClick.AddListener(() =>
-        {
-            if (NetworkManager.Singleton.IsHost)
-            {
-                NetworkManager.Singleton.Shutdown(); // detiene host + cliente
-                Debug.Log("🔴 Host desconectado");
-            }
-            else if (NetworkManager.Singleton.IsClient)
-            {
-                NetworkManager.Singleton.Shutdown(); // detiene cliente
-                Debug.Log("🔴 Cliente desconectado");
-            }
-
-            // Opcional: recargar escena para reiniciar estado
-            // SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        });
     }
 
     void Update()
     {
         if (!NetworkManager.Singleton.IsListening)
         {
-            estadoTexto.text = "🔴 No conectado";
+            estadoTexto.text = "No conectado";
             estadoPanel.GetComponent<Image>().color = Color.red;
         }
         else if (NetworkManager.Singleton.IsHost)
         {
-            estadoTexto.text = "🟢 Host";
-            estadoPanel.GetComponent<Image>().color = Color.green;
+            int totalClientes = NetworkManager.Singleton.ConnectedClients.Count - 1; // -1 porque el host también cuenta como cliente
+
+            if (totalClientes > 0)
+            {
+                estadoTexto.text = $"Host (Clientes: {totalClientes})";
+                estadoPanel.GetComponent<Image>().color = Color.green;
+            }
+            else
+            {
+                estadoTexto.text = "Host esperando clientes...";
+                estadoPanel.GetComponent<Image>().color = Color.green;
+            }
         }
         else if (NetworkManager.Singleton.IsClient)
         {
-            estadoTexto.text = "🔵 Cliente conectado";
+            estadoTexto.text = "Cliente conectado";
             estadoPanel.GetComponent<Image>().color = Color.cyan;
         }
-        
-        //NetworkManager.Singleton.SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+
+
     }
 
-    public void ChangeScene(string sceneName)
+    private void OnClientConnected(ulong clientId)
     {
-        SceneManager.LoadScene(sceneName);
+        if (NetworkManager.Singleton.IsHost && clientId != NetworkManager.Singleton.LocalClientId)
+        {
+            Debug.Log($"Cliente conectado con ID: {clientId}");
+
+            // Cambiar el texto del panel y su color
+            estadoTexto.text = $"Cliente conectado (ID: {clientId})";
+            estadoPanel.GetComponent<Image>().color = Color.yellow;
+
+            // Opcional: podrías iniciar alguna lógica adicional aquí
+        }
+    }
+
+    void OnDestroy()
+    {
+        if (NetworkManager.Singleton != null)
+            NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
     }
 }
