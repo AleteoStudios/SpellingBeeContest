@@ -1,0 +1,148 @@
+﻿using System.IO;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using System.Collections;
+using TMPro;
+using System.Xml;
+
+
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
+public class ExcelToJsonUI : MonoBehaviour
+{
+    public Button cargarArchivoBtn;
+    public Button convertirJsonBtn;
+    public TextMeshProUGUI rutaArchivoTxt;
+    public Slider barraProgreso;
+    public TextMeshProUGUI mensajeEstado;
+    public TMP_InputField inputNombreArchivo;
+
+    private string rutaCSV;
+
+    [System.Serializable]
+    public class DataRow
+    {
+        public string word;
+        public string speech;
+        public string sentence;
+        public string definition;
+    }
+
+    void Start()
+    {
+        cargarArchivoBtn.onClick.AddListener(SeleccionarArchivo);
+        convertirJsonBtn.onClick.AddListener(() => StartCoroutine(ConvertirAJson()));
+        barraProgreso.value = 0;
+        mensajeEstado.text = "";
+    }
+
+    void SeleccionarArchivo()
+    {
+#if UNITY_EDITOR
+        rutaCSV = EditorUtility.OpenFilePanel("Selecciona archivo CSV", "", "csv");
+        rutaArchivoTxt.text = rutaCSV != "" ? rutaCSV : "Ningún archivo seleccionado.";
+        mensajeEstado.text = "";
+#endif
+    }
+
+    IEnumerator ConvertirAJson()
+    {
+        if (string.IsNullOrEmpty(rutaCSV))
+        {
+            mensajeEstado.text = "No se ha seleccionado un archivo.";
+            yield break;
+        }
+
+        string nombreArchivo = inputNombreArchivo.text.Trim();
+        if (string.IsNullOrEmpty(nombreArchivo))
+        {
+            mensajeEstado.text = "Por favor, ingresa un nombre para el archivo JSON.";
+            yield break;
+        }
+
+        if (!nombreArchivo.EndsWith(".json"))
+            nombreArchivo += ".json";
+
+        mensajeEstado.text = "Cargando archivo...";
+        barraProgreso.value = 0.1f;
+
+        List<string> lines = new List<string>();
+        try
+        {
+            using (var fs = new FileStream(rutaCSV, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (var reader = new StreamReader(fs))
+            {
+                while (!reader.EndOfStream)
+                {
+                    lines.Add(reader.ReadLine());
+                }
+            }
+        }
+        catch (IOException e)
+        {
+            mensajeEstado.text = "Error al leer archivo: " + e.Message;
+            yield break;
+        }
+
+        yield return null;
+
+        var jsonList = new List<DataRow>();
+        int total = lines.Count - 1;
+
+        for (int i = 1; i < lines.Count; i++)
+        {
+            var values = lines[i].Split(',');
+            var row = new DataRow
+            {
+                word = values.Length > 0 ? values[0] : "",
+                speech = values.Length > 1 ? values[1] : "",
+                sentence = values.Length > 2 ? values[2] : "",
+                definition = values.Length > 3 ? values[3] : ""
+            };
+            jsonList.Add(row);
+
+            barraProgreso.value = 0.1f + 0.7f * (i / (float)total);
+            yield return null;
+        }
+
+        barraProgreso.value = 0.9f;
+
+        
+        string jsonFinal = "[\n";
+
+        for (int i = 0; i < jsonList.Count; i++)
+        {
+            string elemento = JsonUtility.ToJson(jsonList[i], true);
+            jsonFinal += elemento;
+            if (i < jsonList.Count - 1)
+                jsonFinal += ",\n";
+        }
+        jsonFinal += "\n]";
+
+        string carpetaDestino = Application.dataPath + "/StreamingAssets/";
+
+        try
+        {
+            File.WriteAllText(Path.Combine(carpetaDestino, nombreArchivo), jsonFinal);
+#if UNITY_EDITOR
+            AssetDatabase.Refresh();
+#endif
+        }
+        catch (IOException e)
+        {
+            mensajeEstado.text = "Error al guardar JSON: " + e.Message;
+            yield break;
+        }
+
+        barraProgreso.value = 1f;
+        mensajeEstado.text = $"Archivo '{nombreArchivo}' convertido correctamente 🎉";
+    }
+}
+
+
+
+

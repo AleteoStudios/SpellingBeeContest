@@ -73,6 +73,13 @@ public class Timer : NetworkBehaviour
 
     }
 
+
+
+    public void StopTimer()
+    {
+        startTimer = false;
+    }
+
     public void ResetTimer()
     {
         syncedTime.Value = selectedTime;
