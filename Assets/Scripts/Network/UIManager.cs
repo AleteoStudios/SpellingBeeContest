@@ -15,7 +15,7 @@ public class UIManager : MonoBehaviour
     public TMP_Text estadoTexto;
     public GameObject estadoPanel;
 
-    public GameObject[] disabledObjects;
+    public GameObject[] clientDisabledObjects, hostDisabledHostObjects;
 
   
 
@@ -54,11 +54,13 @@ public class UIManager : MonoBehaviour
         else if (NetworkManager.Singleton.IsHost)
         {
             int totalClientes = NetworkManager.Singleton.ConnectedClients.Count - 1; // -1 porque el host también cuenta como cliente
+            DeactivateHosttUI();
 
             if (totalClientes > 0)
             {
                 estadoTexto.text = $"Host (Clientes: {totalClientes})";
                 estadoPanel.GetComponent<Image>().color = Color.green;
+                
             }
             else
             {
@@ -70,7 +72,7 @@ public class UIManager : MonoBehaviour
         {
             estadoTexto.text = "Cliente conectado";
             estadoPanel.GetComponent<Image>().color = Color.cyan;
-            DeactivateAll();
+            DeactivateClientUI();
         }
 
 
@@ -97,9 +99,18 @@ public class UIManager : MonoBehaviour
     }
 
 
-    public void DeactivateAll()
+    public void DeactivateClientUI()
     {
-        foreach (var obj in disabledObjects)
+        foreach (var obj in clientDisabledObjects)
+        {
+            if (obj != null)
+                obj.SetActive(false);
+        }
+    }
+
+    public void DeactivateHosttUI()
+    {
+        foreach (var obj in hostDisabledHostObjects)
         {
             if (obj != null)
                 obj.SetActive(false);

@@ -5,6 +5,8 @@ using Unity.Netcode;
 
 public class Timer : NetworkBehaviour
 {
+    public LetterManager letterManager;
+
     public Slider timeSlider;
     public TextMeshProUGUI timeLabel;
     public TextMeshProUGUI txtTime;
@@ -39,6 +41,7 @@ public class Timer : NetworkBehaviour
                 syncedTime.Value = 0f;
                 startTimer = false;
                 toggle.isOn = false;
+                letterManager.IncorrectBtnServerRpc();
             }
         }
 

@@ -126,7 +126,7 @@ public class LetterManager : NetworkBehaviour
     {
         if (!IsServer) return; // Solo el host modifica variables de red
 
-        EvaluatorManager();
+        RunEvaluatorForAll();
         TimerManager();
 
         index = UnityEngine.Random.Range(0, spellingWord.Count);
@@ -169,7 +169,7 @@ public class LetterManager : NetworkBehaviour
 
     public void Home()
     {
-        EvaluatorManager();
+        RunEvaluatorForAll();
         TimerManager();
         spellingWord.Clear();
         speachList.Clear();
@@ -300,6 +300,63 @@ public class LetterManager : NetworkBehaviour
         level.OnValueChanged += (_, newVal) => levelLabel.text = newVal.ToString();
         
     }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void RightBtnServerRpc()
+    {
+        RightBtnClientRpc();
+    }
+
+   
+
+    [ServerRpc(RequireOwnership = false)]
+    public void IncorrectBtnServerRpc()
+    {
+        IncorrectBtnClientRpc();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void EvaluatorServerRpc()
+    {
+        EvaluatorClientRpc();
+    }
+
+
+    [ClientRpc]
+    void RightBtnClientRpc()
+    {
+        RightBtn(); // Ejecuta el método en todos
+    }
+
+    [ClientRpc]
+    void IncorrectBtnClientRpc()
+    {
+        IncorrectBtn(); // Ejecuta el método en todos
+    }
+
+    [ClientRpc]
+    void EvaluatorClientRpc()
+    {
+        EvaluatorManager();
+    }
+
+    public void RunEvaluatorForAll()
+    {
+        // Ejecuta localmente
+        EvaluatorManager();
+
+        // Si es servidor, notifícalo a todos los clientes
+        if (IsServer)
+        {
+            EvaluatorClientRpc(); // llama al método en clientes
+        }
+        else
+        {
+            // si es cliente, pide al servidor que lo propague
+            EvaluatorServerRpc();
+        }
+    }
+
 
 
 }
