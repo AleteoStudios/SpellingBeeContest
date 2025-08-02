@@ -36,6 +36,7 @@ public class LetterManager : NetworkBehaviour
     public TextMeshProUGUI showingSentence;
     public TextMeshProUGUI showingDefinition;
     public TextMeshProUGUI levelLabel;
+    public TextMeshProUGUI wordsStockLabel;
     //public TextMeshProUGUI levelLabelCnt;
 
     [Header("Variables de Red")]
@@ -45,13 +46,16 @@ public class LetterManager : NetworkBehaviour
     private NetworkVariable<FixedString128Bytes> randomDefinition = new();
     private NetworkVariable<FixedString128Bytes> level = new();
 
+    private NetworkVariable<int> wordsSize = new NetworkVariable<int>(
+        0, NetworkVariableReadPermission.Everyone);
+
     [Header("Panels")]
     public GameObject canvasHost;
     public GameObject canvasHome;
   
   
 
-    public TextMeshProUGUI wordsStock;
+    
 
     //public GameObject panelRight;
     //public GameObject panelIncorrect;
@@ -69,7 +73,7 @@ public class LetterManager : NetworkBehaviour
     public List<string> definitionList = new List<string>();
 
     public int index;
-    public int wordsSize;
+    //public int wordsSize;
 
  
 
@@ -132,7 +136,10 @@ public class LetterManager : NetworkBehaviour
         randomSpeach.Value = new FixedString128Bytes(speachList[index]);
         randomSentence.Value = new FixedString128Bytes(sentencesList[index]);
         randomDefinition.Value = new FixedString128Bytes(definitionList[index]);
-        
+        level.Value = levelLabel.text;
+        wordsSize.Value = spellingWord.Count;
+
+
 
 
         // Borra los elementos ya usados
@@ -176,8 +183,8 @@ public class LetterManager : NetworkBehaviour
     {
         fileName = "Round1";
         LoadJsonData();
+        levelLabel.text = "1st Round";
         RandomWord();
-        levelLabel.text = level.Value.ToString();
         //levelLabelCnt.text = "1st Round";
         //levelLabelEva.text = "1st Round";
         canvasHome.SetActive(false);
@@ -188,7 +195,7 @@ public class LetterManager : NetworkBehaviour
     {
         fileName = "Round2";
         LoadJsonData();
-        RandomWord();
+        //RandomWord();
         levelLabel.text = "2nd Round";
         //levelLabelCnt.text = "2nd Round";
         //levelLabelEva.text = "2nd Round";
@@ -200,7 +207,7 @@ public class LetterManager : NetworkBehaviour
     {
         fileName = "Round3";
         LoadJsonData();
-        RandomWord();
+        //RandomWord();
         levelLabel.text = "3rd Round";
         //levelLabelCnt.text = "3rd Round";
         //levelLabelEva.text = "3rd Round";
@@ -212,7 +219,7 @@ public class LetterManager : NetworkBehaviour
     {
         fileName = "Round4";
         LoadJsonData();
-        RandomWord();
+        //RandomWord();
         levelLabel.text = "4th Round";
         //levelLabelCnt.text = "4th Round";
         //levelLabelEva.text = "4th Round";
@@ -225,7 +232,7 @@ public class LetterManager : NetworkBehaviour
     {
         fileName = "Round5";
         LoadJsonData();
-        RandomWord();
+        //RandomWord();
         levelLabel.text = "5th Round";
         //levelLabelCnt.text = "5th Round";
         //levelLabelEva.text = "5th Round";
@@ -238,7 +245,7 @@ public class LetterManager : NetworkBehaviour
     {
         fileName = "3grade3row";
         LoadJsonData();
-        RandomWord();
+        //RandomWord();
         levelLabel.text = "3rd Grade 2nd Row";
         //levelLabelCnt.text = "3rd Grade 2nd Row";
         //levelLabelEva.text = "3rd Grade 2nd Row";
@@ -271,14 +278,16 @@ public class LetterManager : NetworkBehaviour
 
     public void Update()
     {
-        wordsSize = spellingWord.Count;
-        wordsStock.text = "Words in stock: " + wordsSize.ToString();
+        
+        wordsStockLabel.text = "Words in stock: " + wordsSize.Value;
+        
 
         if(Input.GetKeyDown("space"))
         {
-            RandomWord();
+            //RandomWord();
         }
 
+        
 
     }
 
@@ -289,6 +298,7 @@ public class LetterManager : NetworkBehaviour
         randomSentence.OnValueChanged += (_, newVal) => showingSentence.text = "<b>Sentence: </b>" + newVal.ToString();
         randomDefinition.OnValueChanged += (_, newVal) => showingDefinition.text = "<b>Definition: </b>" + newVal.ToString();
         level.OnValueChanged += (_, newVal) => levelLabel.text = newVal.ToString();
+        
     }
 
 

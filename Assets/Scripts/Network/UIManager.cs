@@ -15,6 +15,8 @@ public class UIManager : MonoBehaviour
     public TMP_Text estadoTexto;
     public GameObject estadoPanel;
 
+    public GameObject[] disabledObjects;
+
   
 
     void Start()
@@ -68,6 +70,7 @@ public class UIManager : MonoBehaviour
         {
             estadoTexto.text = "Cliente conectado";
             estadoPanel.GetComponent<Image>().color = Color.cyan;
+            DeactivateAll();
         }
 
 
@@ -91,5 +94,15 @@ public class UIManager : MonoBehaviour
     {
         if (NetworkManager.Singleton != null)
             NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
+    }
+
+
+    public void DeactivateAll()
+    {
+        foreach (var obj in disabledObjects)
+        {
+            if (obj != null)
+                obj.SetActive(false);
+        }
     }
 }

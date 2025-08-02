@@ -2775,6 +2775,12 @@ MonoBehaviour:
   discoveryClient: {fileID: 1731515871}
   estadoTexto: {fileID: 1700432494}
   estadoPanel: {fileID: 1483811905}
+  disabledObjects:
+  - {fileID: 1942897366}
+  - {fileID: 1136049483}
+  - {fileID: 1139650672}
+  - {fileID: 1096265978}
+  - {fileID: 177595615}
 --- !u!114 &1012650927
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2794,9 +2800,9 @@ MonoBehaviour:
   showingSentence: {fileID: 1405477527}
   showingDefinition: {fileID: 1054982081}
   levelLabel: {fileID: 1337999501}
+  wordsStockLabel: {fileID: 328816650}
   canvasHost: {fileID: 2122863945}
   canvasHome: {fileID: 177595615}
-  wordsStock: {fileID: 328816650}
   imageStatus: {fileID: 1245087487}
   spriteRight: {fileID: 21300000, guid: 523746bfef93ae440a320491f8c6fafa, type: 3}
   spriteIncorrect: {fileID: 21300000, guid: 73e1c9ddab6819a43ac929820223d9b5, type: 3}
@@ -2807,11 +2813,6 @@ MonoBehaviour:
   sentencesList: []
   definitionList: []
   index: 0
-  wordsSize: 0
-  randomWord: 
-  randomSpeach: 
-  randomSentence: 
-  randomDefinition: 
 --- !u!1 &1030589728
 GameObject:
   m_ObjectHideFlags: 0
@@ -2894,55 +2895,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1030589731}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1942897366}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 1139650672}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 1136049483}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 177595615}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1030589731
 MonoBehaviour:
   m_ObjectHideFlags: 0
