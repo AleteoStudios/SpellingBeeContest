@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using System.Collections;
 using TMPro;
 using System.Xml;
+using SFB;
 
 
 
@@ -42,11 +43,17 @@ public class ExcelToJsonUI : MonoBehaviour
 
     void SeleccionarArchivo()
     {
-#if UNITY_EDITOR
-        rutaCSV = EditorUtility.OpenFilePanel("Selecciona archivo CSV", "", "csv");
-        rutaArchivoTxt.text = rutaCSV != "" ? rutaCSV : "Ningún archivo seleccionado.";
-        mensajeEstado.text = "";
-#endif
+        var paths = StandaloneFileBrowser.OpenFilePanel("Selecciona archivo CSV", "", "csv", false);
+        if (paths.Length > 0 && !string.IsNullOrEmpty(paths[0]))
+        {
+            rutaCSV = paths[0];
+            rutaArchivoTxt.text = rutaCSV;
+            mensajeEstado.text = "";
+        }
+        else
+        {
+            rutaArchivoTxt.text = "Ningún archivo seleccionado.";
+        }
     }
 
     IEnumerator ConvertirAJson()

@@ -10,6 +10,7 @@ public class Timer : NetworkBehaviour
     public Slider timeSlider;
     public TextMeshProUGUI timeLabel;
     public TextMeshProUGUI txtTime;
+    public TextMeshProUGUI txtSpellerTime;
     public Toggle toggle;
 
     [SerializeField]
@@ -53,6 +54,7 @@ public class Timer : NetworkBehaviour
     {
         int seconds = Mathf.CeilToInt(syncedTime.Value);
         txtTime.text = "00:" + seconds.ToString("00");
+        txtSpellerTime.text = "00:" + seconds.ToString("00");
 
         if (timeSlider != null)
             timeSlider.value = (int)selectedTime;

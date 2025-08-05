@@ -37,7 +37,7 @@ public class LetterManager : NetworkBehaviour
     public TextMeshProUGUI showingDefinition;
     public TextMeshProUGUI levelLabel;
     public TextMeshProUGUI wordsStockLabel;
-    //public TextMeshProUGUI levelLabelCnt;
+    public TextMeshProUGUI levelLabelCnt;
 
     [Header("Variables de Red")]
     private NetworkVariable<FixedString128Bytes> randomWord = new();
@@ -50,15 +50,12 @@ public class LetterManager : NetworkBehaviour
         0, NetworkVariableReadPermission.Everyone);
 
     [Header("Panels")]
+
     public GameObject canvasHost;
     public GameObject canvasHome;
-  
-  
 
-    
-
-    //public GameObject panelRight;
-    //public GameObject panelIncorrect;
+    public GameObject panelRight;
+    public GameObject panelIncorrect;
 
     public Image imageStatus;
     public Sprite spriteRight, spriteIncorrect,spriteLogo;
@@ -73,7 +70,7 @@ public class LetterManager : NetworkBehaviour
     public List<string> definitionList = new List<string>();
 
     public int index;
-    //public int wordsSize;
+    
 
  
 
@@ -86,9 +83,8 @@ public class LetterManager : NetworkBehaviour
 
     private void Start()
     {
-        //canvasHost.SetActive(false);
-        //levelLabelCnt.text = "Ready?";
         
+        levelLabelCnt.text = "Ready?";
 
     }
 
@@ -153,7 +149,7 @@ public class LetterManager : NetworkBehaviour
 
     public void RightBtn()
     {
-        //panelRight.SetActive(true);
+        panelRight.SetActive(true);
         imageStatus.sprite = spriteRight;
         timerManager.StopTimer();
         timerManager.toggle.isOn = false;
@@ -161,7 +157,7 @@ public class LetterManager : NetworkBehaviour
 
     public void IncorrectBtn()
     {
-        //panelIncorrect.SetActive(true);
+        panelIncorrect.SetActive(true);
         imageStatus.sprite = spriteIncorrect;
         timerManager.StopTimer();
         timerManager.toggle.isOn = false;
@@ -177,7 +173,7 @@ public class LetterManager : NetworkBehaviour
         definitionList.Clear();
         canvasHost.SetActive(false);
         canvasHome.SetActive(true);
-        //levelLabelCnt.text = "Ready?";
+        levelLabelCnt.text = "Ready?";
     }
     public void Level1()
     {
@@ -185,8 +181,7 @@ public class LetterManager : NetworkBehaviour
         LoadJsonData();
         levelLabel.text = "1st Round";
         RandomWord();
-        //levelLabelCnt.text = "1st Round";
-        //levelLabelEva.text = "1st Round";
+        levelLabelCnt.text = "1st Round";
         canvasHome.SetActive(false);
         canvasHost.SetActive(true);
     }
@@ -195,10 +190,9 @@ public class LetterManager : NetworkBehaviour
     {
         fileName = "Round2";
         LoadJsonData();
-        //RandomWord();
+        RandomWord();
         levelLabel.text = "2nd Round";
-        //levelLabelCnt.text = "2nd Round";
-        //levelLabelEva.text = "2nd Round";
+        levelLabelCnt.text = "2nd Round";
         canvasHome.SetActive(false);
         canvasHost.SetActive(true);
     }
@@ -207,10 +201,9 @@ public class LetterManager : NetworkBehaviour
     {
         fileName = "Round3";
         LoadJsonData();
-        //RandomWord();
+        RandomWord();
         levelLabel.text = "3rd Round";
-        //levelLabelCnt.text = "3rd Round";
-        //levelLabelEva.text = "3rd Round";
+        levelLabelCnt.text = "3rd Round";
         canvasHome.SetActive(false);
         canvasHost.SetActive(true);
     }
@@ -219,39 +212,34 @@ public class LetterManager : NetworkBehaviour
     {
         fileName = "Round4";
         LoadJsonData();
-        //RandomWord();
+        RandomWord();
         levelLabel.text = "4th Round";
-        //levelLabelCnt.text = "4th Round";
-        //levelLabelEva.text = "4th Round";
+        levelLabelCnt.text = "4th Round";
         canvasHome.SetActive(false);
         canvasHost.SetActive(true);
- 
+
     }
 
     public void Level5()
     {
         fileName = "Round5";
         LoadJsonData();
-        //RandomWord();
+        RandomWord();
         levelLabel.text = "5th Round";
-        //levelLabelCnt.text = "5th Round";
-        //levelLabelEva.text = "5th Round";
+        levelLabelCnt.text = "5th Round";
         canvasHome.SetActive(false);
         canvasHost.SetActive(true);
-
     }
 
     public void Level6()
     {
         fileName = "3grade3row";
         LoadJsonData();
-        //RandomWord();
+        RandomWord();
         levelLabel.text = "3rd Grade 2nd Row";
-        //levelLabelCnt.text = "3rd Grade 2nd Row";
-        //levelLabelEva.text = "3rd Grade 2nd Row";
+        levelLabelCnt.text = "3rd Grade 2nd Row";
         canvasHome.SetActive(false);
         canvasHost.SetActive(true);
-
     }
 
 
@@ -264,8 +252,8 @@ public class LetterManager : NetworkBehaviour
 
     void EvaluatorManager()
     {
-        //panelRight.SetActive(false);
-        //panelIncorrect.SetActive(false);
+        panelRight.SetActive(false);
+        panelIncorrect.SetActive(false);
         imageStatus.sprite = spriteLogo;
     }
 
@@ -284,7 +272,7 @@ public class LetterManager : NetworkBehaviour
 
         if(Input.GetKeyDown("space"))
         {
-            //RandomWord();
+            RandomWord();
         }
 
         
