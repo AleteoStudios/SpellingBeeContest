@@ -6,7 +6,7 @@ public class JsonHelper
 	public static T[] FromJsonArray<T>(string json)
 	{
 		string newJson = "{ \"array\": " + json + "}";
-		Wrapper<T> wrapper = UnityEngine.JsonUtility.FromJson<Wrapper<T>>(newJson);
+		Wrapper<T> wrapper = JsonUtility.FromJson<Wrapper<T>>(newJson);
 		return wrapper.array;
 	}
 

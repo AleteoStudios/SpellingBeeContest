@@ -9,6 +9,7 @@ using SFB;
 
 
 
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -118,7 +119,7 @@ public class ExcelToJsonUI : MonoBehaviour
 
         barraProgreso.value = 0.9f;
 
-        
+
         string jsonFinal = "[\n";
 
         for (int i = 0; i < jsonList.Count; i++)
@@ -130,7 +131,14 @@ public class ExcelToJsonUI : MonoBehaviour
         }
         jsonFinal += "\n]";
 
-        string carpetaDestino = Application.dataPath + "/StreamingAssets/";
+        string carpetaDestino = Path.Combine(Application.persistentDataPath, "Datos");
+        
+        if (!Directory.Exists(carpetaDestino))
+        {
+            Directory.CreateDirectory(carpetaDestino);
+            Debug.Log("Carpeta creada en: " + carpetaDestino);
+        }
+
 
         try
         {
@@ -149,7 +157,4 @@ public class ExcelToJsonUI : MonoBehaviour
         mensajeEstado.text = $"Archivo '{nombreArchivo}' convertido correctamente 🎉";
     }
 }
-
-
-
 

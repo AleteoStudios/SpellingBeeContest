@@ -15,13 +15,13 @@ public class LetterManager : NetworkBehaviour
     [Serializable]
     public class WordData
     {
-        
+
         public string word;
         public string speech;
         public string sentence;
         public string definition;
-    
-      
+
+
     }
 
     [Header("JSON")]
@@ -58,8 +58,8 @@ public class LetterManager : NetworkBehaviour
     public GameObject panelIncorrect;
 
     public Image imageStatus;
-    public Sprite spriteRight, spriteIncorrect,spriteLogo;
-    
+    public Sprite spriteRight, spriteIncorrect, spriteLogo;
+
 
 
     public Timer timerManager;
@@ -70,41 +70,55 @@ public class LetterManager : NetworkBehaviour
     public List<string> definitionList = new List<string>();
 
     public int index;
-    
 
- 
+
+
 
     private void Awake()
     {
-
+       
     }
 
-    
+
 
     private void Start()
     {
-        
+
         levelLabelCnt.text = "Ready?";
+        SaveData();
 
     }
 
-    
+
 
     private void LoadJsonData()
     {
-        string filePath = Path.Combine(Application.streamingAssetsPath, fileName + fileFormat);
+        string filePath = Path.Combine(Application.persistentDataPath,"Datos",fileName + fileFormat);
+        Debug.Log("Intentando cargar JSON desde: " + filePath);
 
         if (File.Exists(filePath))
         {
             string fileJson = File.ReadAllText(filePath);
+            Debug.Log("Contenido JSON: " + fileJson);
+
             words = JsonHelper.FromJsonArray<WordData>(fileJson);
 
+            if (words == null || words.Length == 0)
+            {
+                Debug.LogError("No se pudo deserializar el JSON o está vacío.");
+                return;
+            }
         }
-
         else
         {
-            Debug.Log("No se encontro JSON");
+            Debug.LogError("No se encontró el archivo JSON: " + filePath);
+            return;
         }
+
+        spellingWord.Clear();
+        speachList.Clear();
+        sentencesList.Clear();
+        definitionList.Clear();
 
         for (int i = 0; i < words.Length; i++)
         {
@@ -114,6 +128,7 @@ public class LetterManager : NetworkBehaviour
             definitionList.Add(words[i].definition);
         }
 
+        Debug.Log($"Se cargaron correctamente {words.Length} palabras desde: {filePath}");
     }
 
 
@@ -262,20 +277,20 @@ public class LetterManager : NetworkBehaviour
         Application.Quit();
     }
 
-   
+
 
     public void Update()
     {
-        
-        wordsStockLabel.text = "Words in stock: " + wordsSize.Value;
-        
 
-        if(Input.GetKeyDown("space"))
+        wordsStockLabel.text = "Words in stock: " + wordsSize.Value;
+
+
+        if (Input.GetKeyDown("space"))
         {
             RandomWord();
         }
 
-        
+
 
     }
 
@@ -286,7 +301,7 @@ public class LetterManager : NetworkBehaviour
         randomSentence.OnValueChanged += (_, newVal) => showingSentence.text = "<b>Sentence: </b>" + newVal.ToString();
         randomDefinition.OnValueChanged += (_, newVal) => showingDefinition.text = "<b>Definition: </b>" + newVal.ToString();
         level.OnValueChanged += (_, newVal) => levelLabel.text = newVal.ToString();
-        
+
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -295,7 +310,7 @@ public class LetterManager : NetworkBehaviour
         RightBtnClientRpc();
     }
 
-   
+
 
     [ServerRpc(RequireOwnership = false)]
     public void IncorrectBtnServerRpc()
@@ -345,6 +360,11 @@ public class LetterManager : NetworkBehaviour
         }
     }
 
+    public void SaveData()
+    {
+        LoadJsonData();
+        RandomWord();
+    }
 
 
 }
