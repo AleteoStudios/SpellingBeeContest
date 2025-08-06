@@ -60,6 +60,9 @@ public class LetterManager : NetworkBehaviour
     public Image imageStatus;
     public Sprite spriteRight, spriteIncorrect, spriteLogo;
 
+    [Header("Sound")]
+    public AudioSource audioSource;
+    public AudioClip audioRightClip, audioWrongClip, audio5Clip;
 
 
     public Timer timerManager;
@@ -164,6 +167,7 @@ public class LetterManager : NetworkBehaviour
 
     public void RightBtn()
     {
+        audioSource.PlayOneShot(audioRightClip);
         panelRight.SetActive(true);
         imageStatus.sprite = spriteRight;
         timerManager.StopTimer();
@@ -172,6 +176,7 @@ public class LetterManager : NetworkBehaviour
 
     public void IncorrectBtn()
     {
+        audioSource.PlayOneShot(audioWrongClip);
         panelIncorrect.SetActive(true);
         imageStatus.sprite = spriteIncorrect;
         timerManager.StopTimer();
@@ -366,5 +371,10 @@ public class LetterManager : NetworkBehaviour
         RandomWord();
     }
 
+    public void Last5Secconds()
+    {
+        audioSource.PlayOneShot(audio5Clip);
+        
+    }
 
 }

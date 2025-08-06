@@ -13,6 +13,8 @@ public class Timer : NetworkBehaviour
     public TextMeshProUGUI txtSpellerTime;
     public Toggle toggle;
 
+    
+
     [SerializeField]
     private NetworkVariable<float> syncedTime = new NetworkVariable<float>(
         0f, NetworkVariableReadPermission.Everyone);
@@ -45,6 +47,8 @@ public class Timer : NetworkBehaviour
                 letterManager.IncorrectBtnServerRpc();
             }
         }
+
+       
 
         // Actualizar UI en todos los clientes y el host
         UpdateUI();
@@ -89,4 +93,5 @@ public class Timer : NetworkBehaviour
     {
         syncedTime.Value = selectedTime;
     }
+
 }
