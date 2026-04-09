@@ -103,13 +103,13 @@ public class ExcelToJsonUI : MonoBehaviour
 
         for (int i = 1; i < lines.Count; i++)
         {
-            var values = lines[i].Split(',');
+            var values = ParseCSVLine(lines[i]);
             var row = new DataRow
             {
-                word = values.Length > 0 ? values[0] : "",
-                speech = values.Length > 1 ? values[1] : "",
-                sentence = values.Length > 2 ? values[2] : "",
-                definition = values.Length > 3 ? values[3] : ""
+                word = values.Count > 0 ? values[0] : "",
+                speech = values.Count > 1 ? values[1] : "",
+                sentence = values.Count > 2 ? values[2] : "",
+                definition = values.Count > 3 ? values[3] : ""
             };
             jsonList.Add(row);
 
@@ -155,6 +155,45 @@ public class ExcelToJsonUI : MonoBehaviour
 
         barraProgreso.value = 1f;
         mensajeEstado.text = $"Archivo '{nombreArchivo}' convertido correctamente 🎉";
+    }
+
+
+    List<string> ParseCSVLine(string line)
+    {
+        List<string> result = new List<string>();
+        bool insideQuotes = false;
+        string current = "";
+
+        for (int i = 0; i < line.Length; i++)
+        {
+            char c = line[i];
+
+            if (c == '"')
+            {
+                // Manejo de comillas dobles ""
+                if (insideQuotes && i + 1 < line.Length && line[i + 1] == '"')
+                {
+                    current += '"';
+                    i++;
+                }
+                else
+                {
+                    insideQuotes = !insideQuotes;
+                }
+            }
+            else if (c == ',' && !insideQuotes)
+            {
+                result.Add(current);
+                current = "";
+            }
+            else
+            {
+                current += c;
+            }
+        }
+
+        result.Add(current);
+        return result;
     }
 }
 

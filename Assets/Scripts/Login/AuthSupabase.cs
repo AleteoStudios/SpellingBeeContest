@@ -8,6 +8,8 @@ using UnityEngine.Networking;
 [Serializable] class SupaLoginRes { public string access_token; public string refresh_token; public int expires_in; public string token_type; }
 [Serializable] class SupaError { public string error; public string error_description; }
 
+[Serializable] class SupaUser { public string id; }
+
 public static class AuthSupabase
 {
     // ⚠️ Rellena con tu proyecto
@@ -27,6 +29,8 @@ public static class AuthSupabase
     public static bool IsLoggedIn => !string.IsNullOrEmpty(AccessToken);
     public static bool IsTokenNearExpiry => (ExpiresAtUtc - DateTime.UtcNow) < TimeSpan.FromMinutes(2);
 
+    private const string PK_USER_ID = "supa_user_id";
+    public static string UserId => PlayerPrefs.GetString(PK_USER_ID, null);
     public static void ClearSession()
     {
         PlayerPrefs.DeleteKey(PK_ACCESS);
@@ -61,7 +65,7 @@ public static class AuthSupabase
 
         var res = JsonUtility.FromJson<SupaLoginRes>(www.downloadHandler.text);
         SaveSession(res);
-        onOk?.Invoke();
+        yield return FetchAndSaveUserId(onOk, onError);
     }
 
     public static IEnumerator Refresh(Action onOk, Action<string> onError)
@@ -189,5 +193,27 @@ public static class AuthSupabase
     {
         try { var e = JsonUtility.FromJson<SupaError>(json); return $"{e.error}: {e.error_description}".Trim(':'); }
         catch { return null; }
+    }
+
+    private static IEnumerator FetchAndSaveUserId(Action onOk, Action<string> onError)
+    {
+        using var www = UnityWebRequest.Get($"{SUPABASE_URL}/auth/v1/user");
+        // Usamos el token que acabamos de recibir en el login
+        www.SetRequestHeader("apikey", SUPABASE_ANON_KEY);
+        www.SetRequestHeader("Authorization", $"Bearer {AccessToken}");
+
+        yield return www.SendWebRequest();
+
+        if (www.result == UnityWebRequest.Result.Success)
+        {
+            var user = JsonUtility.FromJson<SupaUser>(www.downloadHandler.text);
+            PlayerPrefs.SetString(PK_USER_ID, user.id);
+            PlayerPrefs.Save();
+            onOk?.Invoke();
+        }
+        else
+        {
+            onError?.Invoke($"Error obteniendo perfil: {www.error}");
+        }
     }
 }
